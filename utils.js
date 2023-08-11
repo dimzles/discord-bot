@@ -63,7 +63,7 @@ export function formatBattlemetricsData(data) {
   ### IP: connect ${data.data.attributes.ip}:${data.data.attributes.port}
   ### ${data.data.attributes.players}/${data.data.attributes.maxPlayers} players
   ### Map: ${data.data.attributes.details.rust_maps.url}
-  ### Last wipe: ${daysAgo} days ago (${wipeDate.toUTCString()}) 
+  ### Last wipe: ${daysAgo} ${daysAgo == 1 ? 'day' : 'days'} ago (${wipeDate.toUTCString()}) 
   `
   return formattedData;
 }
