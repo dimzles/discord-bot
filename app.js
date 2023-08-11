@@ -7,7 +7,7 @@ import {
   MessageComponentTypes,
   ButtonStyleTypes,
 } from 'discord-interactions';
-import { VerifyDiscordRequest, getRandomEmoji, DiscordRequest } from './utils.js';
+import { VerifyDiscordRequest, getRandomEmoji, DiscordRequest, formatBattlemetricsData } from './utils.js';
 import { getShuffledOptions, getResult } from './game.js';
 
 // Create an express app
@@ -40,6 +40,7 @@ app.post('/interactions', async function (req, res) {
    */
   if (type === InteractionType.APPLICATION_COMMAND) {
     const { name } = data;
+    console.log(name);
 
     // "test" command
     if (name === 'test') {
@@ -85,6 +86,22 @@ app.post('/interactions', async function (req, res) {
           ],
         },
       });
+    }
+    if (name === 'info') {
+        // User's object choice
+        const serverId = req.body.data.options[0].value;
+        console.log(serverId)
+
+        let response = await fetch(`https://api.battlemetrics.com/servers/${serverId}`);
+        let result = await response.json();
+        let msg = formatBattlemetricsData(result)
+        
+        return res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: msg
+          }
+        })
     }
   }
 

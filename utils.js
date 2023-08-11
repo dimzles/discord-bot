@@ -20,12 +20,13 @@ export async function DiscordRequest(endpoint, options) {
   const url = 'https://discord.com/api/v10/' + endpoint;
   // Stringify payloads
   if (options.body) options.body = JSON.stringify(options.body);
+
+  console.log(options.body);
   // Use node-fetch to make requests
   const res = await fetch(url, {
     headers: {
       Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
       'Content-Type': 'application/json; charset=UTF-8',
-      'User-Agent': 'DiscordBot (https://github.com/discord/discord-example-app, 1.0.0)',
     },
     ...options
   });
@@ -47,8 +48,24 @@ export async function InstallGlobalCommands(appId, commands) {
     // This is calling the bulk overwrite endpoint: https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
     await DiscordRequest(endpoint, { method: 'PUT', body: commands });
   } catch (err) {
-    console.error(err);
+    console.error('discord request', err);
   }
+}
+
+export function formatBattlemetricsData(data) {
+  const wipeDate = new Date(data.data.attributes.details.rust_last_wipe);
+  const now = new Date();
+  const daysAgo = Math.floor((now.getTime() - wipeDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  const formattedData = 
+  `
+  ## ${data.data.attributes.name}
+  ### IP: connect ${data.data.attributes.ip}:${data.data.attributes.port}
+  ### ${data.data.attributes.players}/${data.data.attributes.maxPlayers} players
+  ### Map: ${data.data.attributes.details.rust_maps.url}
+  ### Last wipe: ${daysAgo} days ago (${wipeDate.toUTCString()}) 
+  `
+  return formattedData;
 }
 
 // Simple method that returns a random emoji from list
